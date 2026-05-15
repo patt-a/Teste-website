@@ -7,9 +7,7 @@ const STATS_ENTER     = 0.52;
 const STATS_LEAVE     = 0.65;
 
 // ─── ELEMENT REFS ────────────────────────────────────────────────────────────
-const loader         = document.getElementById('loader');
-const loaderBar      = document.getElementById('loader-bar');
-const loaderPercent  = document.getElementById('loader-percent');
+const pageLoaderBar  = document.getElementById('page-loader-bar');
 const heroSection    = document.querySelector('.hero-standalone');
 const canvasWrap     = document.getElementById('canvas-wrap');
 const canvas         = document.getElementById('canvas');
@@ -109,9 +107,11 @@ function preloadFrames() {
       loaded++;
       if (i % 10 === 0) bgColor = sampleBgColor(img);
       const pct = Math.round((loaded / FRAME_COUNT) * 100);
-      loaderBar.style.width = pct + '%';
-      loaderPercent.textContent = pct + '%';
-      if (loaded === FRAME_COUNT) resolve();
+      if (pageLoaderBar) pageLoaderBar.style.width = pct + '%';
+      if (loaded === FRAME_COUNT) {
+        if (pageLoaderBar) pageLoaderBar.classList.add('done');
+        resolve();
+      }
     }
 
     // Phase 1: first 10 frames — fast first paint
@@ -395,18 +395,30 @@ function initMarquee() {
   });
 }
 
-// ─── MAIN INIT ────────────────────────────────────────────────────────────────
-async function init() {
+// ─── STICKY BUY BAR ───────────────────────────────────────────────────────────
+function initStickyBar() {
+  const bar = document.getElementById('sticky-bar');
+  if (!bar) return;
+  const setVisible = gsap.quickSetter(bar, 'className');
+  ScrollTrigger.create({
+    trigger: scrollContainer,
+    start: 'top top',
+    end: 'bottom bottom',
+    onUpdate(self) {
+      const p = self.progress;
+      bar.classList.toggle('visible', p > 0.10 && p < 0.88);
+    },
+  });
+}
+
+// ─── MAIN INIT (non-blocking) ────────────────────────────────────────────────
+function init() {
   gsap.registerPlugin(ScrollTrigger);
   setupCanvas();
   initLenis();
-
-  await preloadFrames();
-
-  loader.classList.add('hidden');
-
   positionSections();
 
+  // Hero visible immediately — no await
   initHeroWordReveal();
   initHeroTransition();
   initFrameScroll();
@@ -414,8 +426,10 @@ async function init() {
   initSectionAnimations();
   initCounters();
   initMarquee();
+  initStickyBar();
 
-  drawFrame(0);
+  // Frames load in background — progress bar updates as they arrive
+  preloadFrames();
 }
 
 document.addEventListener('DOMContentLoaded', init);

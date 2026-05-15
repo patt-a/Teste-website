@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AirPods Pro — Sound beyond imagination</title>
+  <title>AirPods Pro — Silence has a new sound</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet" />
@@ -11,13 +11,14 @@
 </head>
 <body>
 
-  <!-- LOADER -->
-  <div id="loader">
-    <div class="loader-brand">AirPods Pro</div>
-    <div id="loader-bar-wrap">
-      <div id="loader-bar"></div>
-    </div>
-    <div id="loader-percent">0%</div>
+  <!-- THIN PROGRESS BAR (non-blocking) -->
+  <div id="page-loader-bar"></div>
+
+  <!-- STICKY BUY BAR -->
+  <div id="sticky-bar">
+    <span class="sticky-product">AirPods Pro <span class="sticky-gen">2nd generation</span></span>
+    <span class="sticky-price">From $249</span>
+    <a href="#" class="sticky-btn">Shop now</a>
   </div>
 
   <!-- FIXED HEADER -->
@@ -32,47 +33,51 @@
     </nav>
   </header>
 
-  <!-- HERO STANDALONE (100vh, light bg, centered) -->
+  <!-- HERO (100vh, visible immediately) -->
   <section class="hero-standalone">
+    <img class="hero-bg-frame" src="frames/frame_0001.webp" alt="" />
     <div class="hero-content">
       <span class="hero-label">AirPods Pro · 2nd Generation</span>
       <h1 class="hero-heading">
-        <span class="word">Sound</span>
-        <span class="word">beyond</span>
+        <span class="word">Silence</span>
+        <span class="word">has a</span>
         <br />
-        <span class="word">imagination.</span>
+        <span class="word">new sound.</span>
       </h1>
-      <p class="hero-tagline">Active Noise Cancellation. Adaptive Audio.<br />Personalized Spatial Audio.</p>
-      <a href="#" class="hero-cta">Shop now</a>
+      <p class="hero-tagline">Block out the world.<br />Hear what matters.</p>
+      <div class="hero-actions">
+        <a href="#" class="hero-cta">Shop now</a>
+        <span class="hero-badge">From $249</span>
+      </div>
     </div>
     <div class="hero-scroll-hint">
-      <div class="scroll-arrow"></div>
+      <span class="scroll-chevron">↓</span>
     </div>
   </section>
 
-  <!-- CANVAS WRAP (fixed, full viewport) -->
+  <!-- CANVAS WRAP -->
   <div class="canvas-wrap" id="canvas-wrap">
     <canvas id="canvas"></canvas>
   </div>
 
-  <!-- DARK OVERLAY (stats section) -->
+  <!-- DARK OVERLAY -->
   <div id="dark-overlay"></div>
 
-  <!-- MARQUEE (fixed, slides on scroll) -->
+  <!-- MARQUEE -->
   <div class="marquee-wrap" id="marquee-main" data-scroll-speed="-28">
     <p class="marquee-text">SILENCE&nbsp;·&nbsp;SOUND&nbsp;·&nbsp;CLARITY&nbsp;·&nbsp;PRECISION&nbsp;·&nbsp;SILENCE&nbsp;·&nbsp;SOUND&nbsp;·&nbsp;CLARITY&nbsp;·&nbsp;PRECISION&nbsp;·</p>
   </div>
 
-  <!-- SCROLL CONTAINER (950vh) -->
+  <!-- SCROLL CONTAINER (1050vh) -->
   <div id="scroll-container">
 
     <!-- 01 / Noise Cancellation — 22-33% — slide-left -->
     <section class="scroll-section section-content align-left"
              data-enter="22" data-leave="33" data-animation="slide-left">
       <div class="section-inner">
-        <span class="section-label">Active Noise Cancellation</span>
-        <h2 class="section-heading">Silence,<br />on cue.</h2>
-        <p class="section-body">Up to 2× more powerful than any previous AirPods. Six microphones work together to detect and neutralise noise before it reaches your ears — adapting in real time.</p>
+        <span class="section-label">Noise Cancellation</span>
+        <h2 class="section-heading">The world<br />disappears.</h2>
+        <p class="section-body">Up to 2× more powerful ANC than any previous AirPods. Six microphones. Zero distractions. AirPods Pro adapts to your environment in real time — you just listen.</p>
       </div>
     </section>
 
@@ -81,8 +86,8 @@
              data-enter="33" data-leave="46" data-animation="slide-right">
       <div class="section-inner">
         <span class="section-label">Adaptive Audio</span>
-        <h2 class="section-heading">Sound that<br />reads the room.</h2>
-        <p class="section-body">A seamless blend of Transparency and Noise Cancellation, customised to your environment. Conversation Awareness detects your voice and lowers music automatically.</p>
+        <h2 class="section-heading">Never touch a<br />setting again.</h2>
+        <p class="section-body">Adaptive Audio blends Transparency and Noise Cancellation automatically. When you speak, volume drops. When you move, the mix adjusts. It just works.</p>
       </div>
     </section>
 
@@ -113,11 +118,17 @@
         </div>
         <div class="stat">
           <div class="stat-top">
-            <span class="stat-number" data-value="6" data-decimals="0">0</span>
-            <span class="stat-suffix">mic</span>
+            <span class="stat-suffix stat-ip">IP54</span>
           </div>
-          <span class="stat-label">Microphone array</span>
+          <span class="stat-label">Dust &amp; water resistant</span>
         </div>
+      </div>
+      <div class="compat-chips">
+        <span>USB‑C</span>
+        <span>MagSafe</span>
+        <span>Find My</span>
+        <span>Apple Vision Pro</span>
+        <span>iPhone · iPad · Mac</span>
       </div>
     </section>
 
@@ -125,9 +136,31 @@
     <section class="scroll-section section-content align-left"
              data-enter="66" data-leave="77" data-animation="scale-up">
       <div class="section-inner">
-        <span class="section-label">Personalized Spatial Audio</span>
-        <h2 class="section-heading">Cinema<br />in your ears.</h2>
-        <p class="section-body">Dynamic head tracking places sound in three-dimensional space around you — turning any content into an enveloping experience that moves with you.</p>
+        <span class="section-label">Spatial Audio</span>
+        <h2 class="section-heading">Sound that<br />follows you.</h2>
+        <p class="section-body">Dynamic head tracking places audio in three-dimensional space around you. It moves with you. Like a cinema you wear.</p>
+      </div>
+    </section>
+
+    <!-- Press — 78-89% — slide-left -->
+    <section class="scroll-section section-press align-left"
+             data-enter="78" data-leave="89" data-animation="slide-left">
+      <div class="section-inner">
+        <span class="section-label">Critics</span>
+        <div class="press-quotes">
+          <blockquote class="press-quote">
+            <p>"The best noise-canceling earbuds Apple has ever made."</p>
+            <cite>— The Verge</cite>
+          </blockquote>
+          <blockquote class="press-quote">
+            <p>"AirPods Pro 2 offer the best ANC we've tested in true wireless earbuds."</p>
+            <cite>— Wired</cite>
+          </blockquote>
+          <blockquote class="press-quote">
+            <p>"Simply the finest wireless earbuds money can buy."</p>
+            <cite>— TechRadar</cite>
+          </blockquote>
+        </div>
       </div>
     </section>
 
@@ -143,7 +176,7 @@
         </div>
         <div class="cta-right">
           <span class="cta-price">From $249</span>
-          <a href="#" class="cta-button">Shop now</a>
+          <a href="#" class="cta-button">Shop AirPods Pro</a>
           <p class="section-note">Free delivery · AppleCare+ available</p>
         </div>
       </div>
