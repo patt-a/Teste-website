@@ -15,13 +15,19 @@
 /* ─── RESET ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 *, *:focus, *:focus-visible, *:active { outline: none !important; }
-html { scroll-behavior: auto; cursor: none; }
+html {
+  scroll-behavior: auto;
+  cursor: none;
+  overflow-x: hidden;
+  max-width: 100%;
+}
 body {
   background: var(--bg-white);
   color: var(--text);
   font-family: var(--font);
   font-feature-settings: "kern" 1;
   overflow-x: hidden;
+  max-width: 100%;
   -webkit-font-smoothing: antialiased;
   cursor: none;
 }
@@ -371,6 +377,7 @@ body.cursor-hover #cursor-dot {
   opacity: 0;
   pointer-events: none;
   will-change: opacity;
+  max-width: 100vw;
 }
 .marquee-text {
   white-space: nowrap;
