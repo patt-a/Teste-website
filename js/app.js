@@ -3,8 +3,8 @@ const FRAME_COUNT     = 452;   // V1: 151 frames + V2: 301 frames
 const FRAME_SPEED     = 1.8;   // video ends at 1/1.8 = 55.6% scroll
 const IMAGE_SCALE     = 0.88;  // padded cover sweet spot
 const SCROLL_HEIGHT_VH = 1050;
-const STATS_ENTER     = 0.52;
-const STATS_LEAVE     = 0.65;
+const STATS_ENTER     = 0.43;
+const STATS_LEAVE     = 0.56;
 
 // ─── ELEMENT REFS ────────────────────────────────────────────────────────────
 const pageLoaderBar  = document.getElementById('page-loader-bar');
@@ -160,28 +160,50 @@ window.addEventListener('resize', () => {
   ScrollTrigger.refresh();
 });
 
-// ─── HERO WORD REVEAL ─────────────────────────────────────────────────────────
+// ─── HERO WORD REVEAL (clip-path slide-up) ────────────────────────────────────
 function initHeroWordReveal() {
-  const words   = heroSection.querySelectorAll('.hero-heading .word');
-  const label   = heroSection.querySelector('.section-label');
+  const words   = heroSection.querySelectorAll('.word-wrap .word');
+  const label   = heroSection.querySelector('.hero-label');
   const tagline = heroSection.querySelector('.hero-tagline');
+  const actions = heroSection.querySelector('.hero-actions');
   const hint    = heroSection.querySelector('.hero-scroll-hint');
 
-  gsap.set([words, label, tagline, hint], { opacity: 0, y: 28 });
+  gsap.set(words,   { yPercent: 115 });
+  gsap.set([label, tagline, actions, hint], { opacity: 0, y: 18 });
 
-  const tl = gsap.timeline({ delay: 0.2 });
-  tl.to(label,   { opacity: 1,   y: 0, duration: 0.6, ease: 'power3.out' })
-    .to(words,   { opacity: 1,   y: 0, stagger: 0.13, duration: 0.85, ease: 'power3.out' }, '-=0.25')
-    .to(tagline, { opacity: 0.55, y: 0, duration: 0.55, ease: 'power3.out' }, '-=0.2')
-    .to(hint,    { opacity: 0.45, y: 0, duration: 0.5,  ease: 'power2.out' }, '-=0.1');
+  const tl = gsap.timeline({ delay: 0.1 });
+  tl.to(label,   { opacity: 1,   y: 0,       duration: 0.5,  ease: 'power3.out' })
+    .to(words,   { yPercent: 0, stagger: 0.1, duration: 0.9,  ease: 'power4.out' }, '-=0.2')
+    .to(tagline, { opacity: 1,   y: 0,        duration: 0.55, ease: 'power3.out' }, '-=0.35')
+    .to(actions, { opacity: 1,   y: 0,        duration: 0.5,  ease: 'power3.out' }, '-=0.3')
+    .to(hint,    { opacity: 0.5, y: 0,        duration: 0.4,  ease: 'power2.out' }, '-=0.2');
 }
 
 // ─── HERO TRANSITION + CIRCLE WIPE ───────────────────────────────────────────
+// Canvas reveals as the HERO scrolls away (hero-based trigger) so there's no
+// white gap between the headline and the video.
 function initHeroTransition() {
-  // quickSetter caches the property write path — much faster than style.* per frame
-  const setHeroOpacity    = gsap.quickSetter(heroSection,  'opacity');
-  const setMarqueeOpacity = gsap.quickSetter(marqueeWrap,  'opacity');
+  const setHeroOpacity    = gsap.quickSetter(heroSection, 'opacity');
+  const setMarqueeOpacity = gsap.quickSetter(marqueeWrap, 'opacity');
 
+  // Tie canvas clip-path + hero fade to hero section scroll
+  ScrollTrigger.create({
+    trigger: heroSection,
+    start: 'top top',
+    end: 'bottom top',   // completes when hero fully scrolled off
+    scrub: true,
+    onUpdate: (self) => {
+      const p = self.progress;
+      // Hero fades as it scrolls away
+      setHeroOpacity(Math.max(0, 1 - p * 1.6));
+      heroSection.style.pointerEvents = p > 0.12 ? 'none' : 'auto';
+      // Canvas circle-wipe: fully open by 65% of hero scroll
+      const radius = Math.min(82, (p / 0.65) * 82);
+      canvasWrap.style.clipPath = `circle(${radius}% at 50% 50%)`;
+    },
+  });
+
+  // Marquee tied to scroll container (unchanged)
   ScrollTrigger.create({
     trigger: scrollContainer,
     start: 'top top',
@@ -189,14 +211,7 @@ function initHeroTransition() {
     scrub: true,
     onUpdate: (self) => {
       const p = self.progress;
-
-      setHeroOpacity(Math.max(0, 1 - p * 14));
-      heroSection.style.pointerEvents = p > 0.08 ? 'none' : 'auto';
-
-      const wipeProgress = Math.min(1, Math.max(0, (p - 0.01) / 0.06));
-      canvasWrap.style.clipPath = `circle(${wipeProgress * 80}% at 50% 50%)`;
-
-      const mIn  = Math.min(1, Math.max(0, (p - 0.18) / 0.05));
+      const mIn  = Math.min(1, Math.max(0, (p - 0.12) / 0.06));
       const mOut = Math.min(1, Math.max(0, (0.90 - p)  / 0.04));
       setMarqueeOpacity(Math.min(mIn, mOut));
     },
@@ -247,12 +262,14 @@ function initDarkOverlay() {
 }
 
 // ─── SECTION ANIMATION SYSTEM ────────────────────────────────────────────────
+// Trigger-based (not scrubbed) — entrance animation plays at real speed
+// so it looks identical regardless of how early/late the section appears.
 function setupSectionAnimation(section) {
   const type    = section.dataset.animation;
   const persist = section.dataset.persist === 'true';
   const enter   = parseFloat(section.dataset.enter) / 100;
   const leave   = parseFloat(section.dataset.leave) / 100;
-  const range   = leave - enter;
+  const FADE_OUT = 0.25; // last 25% of range: fade section out
 
   const children = Array.from(section.querySelectorAll(
     '.section-label, .section-heading, .section-body, .section-note, .cta-button'
@@ -260,74 +277,68 @@ function setupSectionAnimation(section) {
   const statEls = Array.from(section.querySelectorAll('.stat'));
   const targets = statEls.length ? statEls : children;
 
-  const tl = gsap.timeline({ paused: true });
+  // Reset: section invisible, children at their "from" position
+  const resetTargets = () => {
+    gsap.set(section, { opacity: 0, y: 14 });
+    switch (type) {
+      case 'slide-left':  gsap.set(targets, { x: -65, opacity: 0 }); break;
+      case 'slide-right': gsap.set(targets, { x:  65, opacity: 0 }); break;
+      case 'stagger-up':  gsap.set(targets, { y:  50, opacity: 0 }); break;
+      case 'scale-up':    gsap.set(targets, { scale: 0.88, opacity: 0 }); break;
+      case 'clip-reveal': gsap.set(targets, { clipPath: 'inset(100% 0 0 0)', opacity: 0 }); break;
+      default:            gsap.set(targets, { y: 45, opacity: 0 });
+    }
+  };
+  resetTargets();
 
-  switch (type) {
-    case 'slide-left':
-      tl.from(targets, { x: -80, opacity: 0, stagger: 0.14, duration: 0.9, ease: 'power3.out' });
-      break;
-    case 'slide-right':
-      tl.from(targets, { x: 80,  opacity: 0, stagger: 0.14, duration: 0.9, ease: 'power3.out' });
-      break;
-    case 'stagger-up':
-      tl.from(targets, { y: 60,  opacity: 0, stagger: 0.15, duration: 0.8, ease: 'power3.out' });
-      break;
-    case 'scale-up':
-      tl.from(targets, { scale: 0.85, opacity: 0, stagger: 0.12, duration: 1.0, ease: 'power2.out' });
-      break;
-    case 'clip-reveal':
-      tl.from(targets, {
-        clipPath: 'inset(100% 0 0 0)',
-        opacity: 0,
-        stagger: 0.15,
-        duration: 1.2,
-        ease: 'power4.inOut',
-      });
-      break;
-    default:
-      tl.from(targets, { y: 50, opacity: 0, stagger: 0.12, duration: 0.9, ease: 'power3.out' });
-  }
+  // Entrance: card slides up while children animate in — no instant "pop"
+  const playEntrance = () => {
+    gsap.to(section, { opacity: 1, y: 0, duration: 0.55, ease: 'power3.out' });
+    switch (type) {
+      case 'slide-left':
+      case 'slide-right':
+        gsap.to(targets, { x: 0, opacity: 1, stagger: 0.1, duration: 0.8, ease: 'power3.out', delay: 0.08 });
+        break;
+      case 'stagger-up':
+        gsap.to(targets, { y: 0, opacity: 1, stagger: 0.12, duration: 0.8, ease: 'power3.out', delay: 0.08 });
+        break;
+      case 'scale-up':
+        gsap.to(targets, { scale: 1, opacity: 1, stagger: 0.1, duration: 0.9, ease: 'power2.out', delay: 0.08 });
+        break;
+      case 'clip-reveal':
+        gsap.to(targets, { clipPath: 'inset(0% 0 0 0)', opacity: 1, stagger: 0.12, duration: 1.1, ease: 'power4.inOut', delay: 0.1,
+          onComplete: () => gsap.set(targets, { clipPath: 'none' }) });
+        break;
+      default:
+        gsap.to(targets, { y: 0, opacity: 1, stagger: 0.1, duration: 0.8, ease: 'power3.out', delay: 0.08 });
+    }
+  };
 
-  const FADE_IN_FRAC  = 0.25; // first 25% of range: animate in
-  const FADE_OUT_FRAC = 0.25; // last 25% of range: animate out
+  let visible = false;
+  const setOpacity = gsap.quickSetter(section, 'opacity');
 
   ScrollTrigger.create({
     trigger: scrollContainer,
     start: 'top top',
     end: 'bottom bottom',
-    scrub: true,
-    onUpdate: (self) => {
+    onUpdate(self) {
       const p = self.progress;
+      const fadeOutStart = leave - (leave - enter) * FADE_OUT;
 
-      if (p < enter) {
-        gsap.set(section, { opacity: 0 });
-        tl.progress(0);
-        return;
+      if (p >= enter && !visible) {
+        visible = true;
+        playEntrance();
       }
 
-      if (p >= enter && p <= enter + range * FADE_IN_FRAC) {
-        gsap.set(section, { opacity: 1 });
-        tl.progress((p - enter) / (range * FADE_IN_FRAC));
-        return;
-      }
-
-      const fadeOutStart = leave - range * FADE_OUT_FRAC;
-
-      if (p > enter + range * FADE_IN_FRAC && p <= (persist ? Infinity : fadeOutStart)) {
-        gsap.set(section, { opacity: 1 });
-        tl.progress(1);
-        return;
-      }
-
-      if (!persist && p > fadeOutStart && p <= leave) {
-        const outProg = (p - fadeOutStart) / (range * FADE_OUT_FRAC);
-        gsap.set(section, { opacity: 1 - outProg });
-        tl.progress(1);
-        return;
-      }
-
-      if (!persist && p > leave) {
-        gsap.set(section, { opacity: 0 });
+      if (visible && !persist) {
+        if (p > fadeOutStart && p <= leave) {
+          setOpacity(1 - (p - fadeOutStart) / ((leave - enter) * FADE_OUT));
+        } else if (p > leave) {
+          setOpacity(0);
+        } else if (p < enter) {
+          visible = false;
+          resetTargets();
+        }
       }
     },
   });
@@ -395,6 +406,51 @@ function initMarquee() {
   });
 }
 
+// ─── CUSTOM CURSOR ────────────────────────────────────────────────────────────
+function initCursor() {
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring || window.matchMedia('(hover: none)').matches) return;
+
+  // Use GSAP transform (GPU, no layout reflow)
+  gsap.set([dot, ring], { xPercent: -50, yPercent: -50 });
+  const setDotX  = gsap.quickSetter(dot,  'x', 'px');
+  const setDotY  = gsap.quickSetter(dot,  'y', 'px');
+  const setRingX = gsap.quickSetter(ring, 'x', 'px');
+  const setRingY = gsap.quickSetter(ring, 'y', 'px');
+
+  let mx = window.innerWidth / 2, my = window.innerHeight / 2;
+  let rx = mx, ry = my;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+    setDotX(mx);
+    setDotY(my);
+  });
+
+  gsap.ticker.add(() => {
+    rx += (mx - rx) * 0.11;
+    ry += (my - ry) * 0.11;
+    setRingX(rx);
+    setRingY(ry);
+  });
+
+  // Expand on interactive elements
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest('a, button, .cta-button, .hero-cta, .nav-cta, .sticky-btn')) {
+      document.body.classList.add('cursor-hover');
+    } else {
+      document.body.classList.remove('cursor-hover');
+    }
+  });
+
+  const setDotOpacity  = gsap.quickSetter(dot,  'opacity');
+  const setRingOpacity = gsap.quickSetter(ring, 'opacity');
+  document.addEventListener('mouseleave', () => { setDotOpacity(0); setRingOpacity(0); });
+  document.addEventListener('mouseenter', () => { setDotOpacity(1); setRingOpacity(1); });
+}
+
 // ─── STICKY BUY BAR ───────────────────────────────────────────────────────────
 function initStickyBar() {
   const bar = document.getElementById('sticky-bar');
@@ -406,7 +462,7 @@ function initStickyBar() {
     end: 'bottom bottom',
     onUpdate(self) {
       const p = self.progress;
-      bar.classList.toggle('visible', p > 0.10 && p < 0.88);
+      bar.classList.toggle('visible', p > 0.01 && p < 0.72);
     },
   });
 }
@@ -427,6 +483,7 @@ function init() {
   initCounters();
   initMarquee();
   initStickyBar();
+  initCursor();
 
   // Frames load in background — progress bar updates as they arrive
   preloadFrames();

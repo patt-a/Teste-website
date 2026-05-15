@@ -14,7 +14,8 @@
 
 /* ─── RESET ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: auto; }
+*, *:focus, *:focus-visible, *:active { outline: none !important; }
+html { scroll-behavior: auto; cursor: none; }
 body {
   background: var(--bg-white);
   color: var(--text);
@@ -22,6 +23,65 @@ body {
   font-feature-settings: "kern" 1;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  cursor: none;
+}
+
+/* ─── GRAIN TEXTURE ──────────────────────────────────────────────────────────── */
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 99997;
+  pointer-events: none;
+  opacity: 0.038;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ─── CUSTOM CURSOR ──────────────────────────────────────────────────────────── */
+/* Force cursor:none on every state — prevents browser cursor on click */
+*, *::before, *::after,
+*:hover, *:focus, *:active, *:focus-visible {
+  cursor: none !important;
+}
+
+#cursor-dot {
+  position: fixed;
+  top: 0; left: 0;           /* GSAP positions via transform */
+  width: 6px; height: 6px;
+  background: var(--text);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  will-change: transform;
+  transition: width 0.2s ease, height 0.2s ease, background 0.2s ease;
+}
+#cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  width: 34px; height: 34px;
+  border: 1.5px solid rgba(29, 29, 31, 0.28);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  will-change: transform;
+  transition: width 0.35s cubic-bezier(0.16,1,0.3,1),
+              height 0.35s cubic-bezier(0.16,1,0.3,1),
+              border-color 0.25s ease,
+              background 0.25s ease;
+}
+body.cursor-hover #cursor-ring {
+  width: 50px; height: 50px;
+  background: rgba(0, 113, 227, 0.08);
+  border-color: var(--blue);
+}
+body.cursor-hover #cursor-dot {
+  width: 5px; height: 5px;
+  background: var(--blue);
+}
+@media (hover: none) {
+  #cursor-dot, #cursor-ring { display: none; }
+  *, *:hover, *:active { cursor: auto !important; }
 }
 
 /* ─── PAGE LOADER BAR (non-blocking, thin bottom line) ──────────────────────── */
@@ -198,7 +258,14 @@ body {
   color: var(--text);
   margin-bottom: 1.25rem;
 }
-.hero-heading .word { display: inline-block; }
+/* Clip-path reveal container */
+.word-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.06em; /* prevent descender clip */
+}
+.word-wrap .word { display: inline-block; }
 
 .hero-tagline {
   font-size: clamp(0.95rem, 1.5vw, 1.2rem);
@@ -269,6 +336,18 @@ body {
   width: 100%;
   height: 100%;
   transform: translateZ(0);
+}
+/* Vignette studio — produit en lumière centrale */
+.canvas-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 75% 75% at 50% 50%,
+    transparent 28%,
+    rgba(245, 245, 247, 0.55) 65%,
+    rgba(245, 245, 247, 0.85) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 /* ─── DARK OVERLAY ───────────────────────────────────────────────────────────── */
@@ -522,12 +601,12 @@ body {
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   white-space: nowrap;
-  box-shadow: 0 4px 20px rgba(0, 113, 227, 0.28);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
 }
 .cta-button:hover {
   background: var(--blue-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0, 113, 227, 0.38);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22);
 }
 .section-note {
   font-size: 0.68rem;

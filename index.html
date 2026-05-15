@@ -11,7 +11,11 @@
 </head>
 <body>
 
-  <!-- THIN PROGRESS BAR (non-blocking) -->
+  <!-- CUSTOM CURSOR -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- THIN PROGRESS BAR -->
   <div id="page-loader-bar"></div>
 
   <!-- STICKY BUY BAR -->
@@ -33,16 +37,16 @@
     </nav>
   </header>
 
-  <!-- HERO (100vh, visible immediately) -->
+  <!-- HERO -->
   <section class="hero-standalone">
     <img class="hero-bg-frame" src="frames/frame_0001.webp" alt="" />
     <div class="hero-content">
       <span class="hero-label">AirPods Pro · 2nd Generation</span>
       <h1 class="hero-heading">
-        <span class="word">Silence</span>
-        <span class="word">has a</span>
+        <span class="word-wrap"><span class="word">Silence</span></span>
+        <span class="word-wrap"><span class="word">has a</span></span>
         <br />
-        <span class="word">new sound.</span>
+        <span class="word-wrap"><span class="word">new sound.</span></span>
       </h1>
       <p class="hero-tagline">Block out the world.<br />Hear what matters.</p>
       <div class="hero-actions">
@@ -68,12 +72,12 @@
     <p class="marquee-text">SILENCE&nbsp;·&nbsp;SOUND&nbsp;·&nbsp;CLARITY&nbsp;·&nbsp;PRECISION&nbsp;·&nbsp;SILENCE&nbsp;·&nbsp;SOUND&nbsp;·&nbsp;CLARITY&nbsp;·&nbsp;PRECISION&nbsp;·</p>
   </div>
 
-  <!-- SCROLL CONTAINER (1050vh) -->
+  <!-- SCROLL CONTAINER -->
   <div id="scroll-container">
 
-    <!-- 01 / Noise Cancellation — 22-33% — slide-left -->
+    <!-- 01 — 8-20% — slide-left -->
     <section class="scroll-section section-content align-left"
-             data-enter="22" data-leave="33" data-animation="slide-left">
+             data-enter="8" data-leave="20" data-animation="slide-left">
       <div class="section-inner">
         <span class="section-label">Noise Cancellation</span>
         <h2 class="section-heading">The world<br />disappears.</h2>
@@ -81,9 +85,9 @@
       </div>
     </section>
 
-    <!-- 02 / Adaptive Audio — 33-46% — slide-right -->
+    <!-- 02 — 21-35% — slide-right -->
     <section class="scroll-section section-content align-right"
-             data-enter="33" data-leave="46" data-animation="slide-right">
+             data-enter="21" data-leave="35" data-animation="slide-right">
       <div class="section-inner">
         <span class="section-label">Adaptive Audio</span>
         <h2 class="section-heading">Never touch a<br />setting again.</h2>
@@ -91,9 +95,9 @@
       </div>
     </section>
 
-    <!-- Stats — 52-65% — stagger-up — dark overlay -->
+    <!-- Stats — 43-56% — stagger-up -->
     <section class="scroll-section section-stats"
-             data-enter="52" data-leave="65" data-animation="stagger-up">
+             data-enter="43" data-leave="56" data-animation="stagger-up">
       <div class="stats-grid">
         <div class="stat">
           <div class="stat-top">
@@ -118,7 +122,7 @@
         </div>
         <div class="stat">
           <div class="stat-top">
-            <span class="stat-suffix stat-ip">IP54</span>
+            <span class="stat-ip">IP54</span>
           </div>
           <span class="stat-label">Dust &amp; water resistant</span>
         </div>
@@ -132,9 +136,9 @@
       </div>
     </section>
 
-    <!-- 03 / Spatial Audio — 66-77% — scale-up -->
+    <!-- 03 — 57-68% — scale-up -->
     <section class="scroll-section section-content align-left"
-             data-enter="66" data-leave="77" data-animation="scale-up">
+             data-enter="57" data-leave="68" data-animation="scale-up">
       <div class="section-inner">
         <span class="section-label">Spatial Audio</span>
         <h2 class="section-heading">Sound that<br />follows you.</h2>
@@ -142,9 +146,9 @@
       </div>
     </section>
 
-    <!-- Press — 78-89% — slide-left -->
-    <section class="scroll-section section-press align-left"
-             data-enter="78" data-leave="89" data-animation="slide-left">
+    <!-- Press — 69-80% — slide-right -->
+    <section class="scroll-section section-press align-right"
+             data-enter="69" data-leave="80" data-animation="slide-right">
       <div class="section-inner">
         <span class="section-label">Critics</span>
         <div class="press-quotes">
@@ -164,20 +168,20 @@
       </div>
     </section>
 
-    <!-- CTA — 89-100% — clip-reveal — persists — full width footer -->
+    <!-- CTA — 73-100% — clip-reveal — persists -->
     <section class="scroll-section section-cta"
-             data-enter="89" data-leave="100" data-animation="clip-reveal"
+             data-enter="73" data-leave="100" data-animation="clip-reveal"
              data-persist="true">
       <div class="cta-inner">
         <div class="cta-left">
           <span class="section-label">AirPods Pro · 2nd Generation</span>
-          <h2 class="cta-heading">Ready to hear<br />everything.</h2>
+          <h2 class="cta-heading">Try AirPods Pro<br />risk-free.</h2>
           <p class="cta-sub">The most powerful AirPods ever made.</p>
         </div>
         <div class="cta-right">
           <span class="cta-price">From $249</span>
           <a href="#" class="cta-button">Shop AirPods Pro</a>
-          <p class="section-note">Free delivery · AppleCare+ available</p>
+          <p class="section-note">Free delivery · 14-day returns · No questions asked</p>
         </div>
       </div>
     </section>
