@@ -27,9 +27,10 @@ let lenis;
 // ─── LENIS SMOOTH SCROLL ─────────────────────────────────────────────────────
 function initLenis() {
   lenis = new Lenis({
-    duration: 1.2,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    duration: 1.4,
+    easing: (t) => 1 - Math.pow(1 - t, 4), // quartic ease-out — silkier than expo
     smoothWheel: true,
+    wheelMultiplier: 0.9,
   });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
@@ -44,6 +45,8 @@ function setupCanvas() {
     canvas.width  = window.innerWidth  * dpr;
     canvas.height = window.innerHeight * dpr;
     ctx.scale(dpr, dpr);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     drawFrame(currentFrame);
   }
 
@@ -162,6 +165,10 @@ function initHeroWordReveal() {
 
 // ─── HERO TRANSITION + CIRCLE WIPE ───────────────────────────────────────────
 function initHeroTransition() {
+  // quickSetter caches the property write path — much faster than style.* per frame
+  const setHeroOpacity    = gsap.quickSetter(heroSection,  'opacity');
+  const setMarqueeOpacity = gsap.quickSetter(marqueeWrap,  'opacity');
+
   ScrollTrigger.create({
     trigger: scrollContainer,
     start: 'top top',
@@ -170,19 +177,15 @@ function initHeroTransition() {
     onUpdate: (self) => {
       const p = self.progress;
 
-      // Hero fades out fast (done by 7% scroll)
-      heroSection.style.opacity = String(Math.max(0, 1 - p * 14));
+      setHeroOpacity(Math.max(0, 1 - p * 14));
       heroSection.style.pointerEvents = p > 0.08 ? 'none' : 'auto';
 
-      // Canvas circle-wipe: expands from 0.01 to 0.07 scroll progress
       const wipeProgress = Math.min(1, Math.max(0, (p - 0.01) / 0.06));
-      const radius = wipeProgress * 80;
-      canvasWrap.style.clipPath = `circle(${radius}% at 50% 50%)`;
+      canvasWrap.style.clipPath = `circle(${wipeProgress * 80}% at 50% 50%)`;
 
-      // Marquee fades in at 20%, out at 85%
       const mIn  = Math.min(1, Math.max(0, (p - 0.18) / 0.05));
       const mOut = Math.min(1, Math.max(0, (0.90 - p)  / 0.04));
-      marqueeWrap.style.opacity = String(Math.min(mIn, mOut));
+      setMarqueeOpacity(Math.min(mIn, mOut));
     },
   });
 }
@@ -199,7 +202,7 @@ function initFrameScroll() {
       const index = Math.min(Math.floor(accelerated * FRAME_COUNT), FRAME_COUNT - 1);
       if (index !== currentFrame) {
         currentFrame = index;
-        requestAnimationFrame(() => drawFrame(currentFrame));
+        drawFrame(currentFrame);
       }
     },
   });
@@ -208,6 +211,8 @@ function initFrameScroll() {
 // ─── DARK OVERLAY ─────────────────────────────────────────────────────────────
 function initDarkOverlay() {
   const fadeRange = 0.04;
+  const setOverlayOpacity = gsap.quickSetter(darkOverlay, 'opacity');
+
   ScrollTrigger.create({
     trigger: scrollContainer,
     start: 'top top',
@@ -223,7 +228,7 @@ function initDarkOverlay() {
       } else if (p > STATS_LEAVE && p <= STATS_LEAVE + fadeRange) {
         opacity = 0.9 * (1 - (p - STATS_LEAVE) / fadeRange);
       }
-      darkOverlay.style.opacity = String(opacity);
+      setOverlayOpacity(opacity);
     },
   });
 }
