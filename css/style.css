@@ -515,28 +515,51 @@ body {
 @media (max-width: 768px) {
   #scroll-container { height: 620vh; }
 
-  .align-left, .align-right { padding: 0 5vw; }
-
-  .align-left .section-inner,
-  .align-right .section-inner {
-    max-width: 100%;
-    background: rgba(255, 255, 255, 0.85);
-    padding: 1.5rem;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 12px;
+  /* Full-width cards on mobile — collapse side alignment */
+  .align-left, .align-right {
+    padding: 0 4vw;
   }
 
-  .hero-heading { font-size: clamp(3rem, 14vw, 5rem); }
+  .section-content .section-inner {
+    max-width: 100%;
+    background: rgba(255, 255, 255, 0.94);
+    padding: 1.4rem 1.5rem 1.6rem;
+    border-radius: 14px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  }
 
+  /* Hero */
+  .hero-standalone { text-align: center; }
+  .hero-content { padding: 0 6vw; }
+  .hero-heading { font-size: clamp(2.8rem, 13vw, 4.5rem); }
+  .hero-tagline { font-size: 0.9rem; }
+  .hero-cta { padding: 0.8rem 2rem; font-size: 0.85rem; }
+
+  /* Section typography */
+  .section-heading { font-size: clamp(2rem, 8vw, 3rem); }
+  .section-label   { font-size: 0.62rem; }
+  .section-body    { font-size: 0.85rem; }
+
+  /* Stats — 2 columns */
+  .section-stats { padding: 0 4vw; min-height: 45vh; }
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 2.5rem 2vw;
+    gap: 2.5rem 3vw;
   }
+  .stat-number { font-size: clamp(3rem, 14vw, 5rem); }
 
-  .marquee-text { font-size: 18vw; }
+  /* Marquee */
+  .marquee-wrap { bottom: 3vh; }
+  .marquee-text { font-size: 20vw; }
 
-  .section-heading { font-size: clamp(2.2rem, 8vw, 3.5rem); }
+  /* CTA footer */
+  .cta-inner { padding: 2.5rem 5vw; gap: 1.5rem; }
+  .cta-heading { font-size: clamp(2rem, 9vw, 3rem); }
+  .cta-button  { font-size: 0.9rem; padding: 1rem 2.2rem; }
 
+  /* Nav */
   .site-header { padding: 0 1.25rem; }
+  .nav-links li:not(:last-child) { display: none; } /* keep only Buy on mobile */
 }

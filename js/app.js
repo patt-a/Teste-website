@@ -3,8 +3,8 @@ const FRAME_COUNT     = 452;   // V1: 151 frames + V2: 301 frames
 const FRAME_SPEED     = 1.8;   // video ends at 1/1.8 = 55.6% scroll
 const IMAGE_SCALE     = 0.88;  // padded cover sweet spot
 const SCROLL_HEIGHT_VH = 1050;
-const STATS_ENTER     = 0.56;
-const STATS_LEAVE     = 0.69;
+const STATS_ENTER     = 0.52;
+const STATS_LEAVE     = 0.65;
 
 // ─── ELEMENT REFS ────────────────────────────────────────────────────────────
 const loader         = document.getElementById('loader');
@@ -136,9 +136,16 @@ function preloadFrames() {
 }
 
 // ─── SECTION POSITIONING ─────────────────────────────────────────────────────
+// CSS uses different scroll heights on mobile (620vh) vs desktop (1050vh).
+// JS must use the same value to place sections at the correct pixel position.
+function getScrollVH() {
+  return window.innerWidth <= 768 ? 620 : SCROLL_HEIGHT_VH;
+}
+
 function positionSections() {
-  const totalPx = window.innerHeight * (SCROLL_HEIGHT_VH / 100);
+  const totalPx = window.innerHeight * (getScrollVH() / 100);
   document.querySelectorAll('.scroll-section').forEach(section => {
+    if (section.classList.contains('section-cta')) return; // anchored via CSS bottom:0
     const enter = parseFloat(section.dataset.enter) / 100;
     const leave = parseFloat(section.dataset.leave) / 100;
     const mid   = (enter + leave) / 2;
@@ -146,6 +153,12 @@ function positionSections() {
     section.style.transform = 'translateY(-50%)';
   });
 }
+
+// Re-position on orientation change / resize
+window.addEventListener('resize', () => {
+  positionSections();
+  ScrollTrigger.refresh();
+});
 
 // ─── HERO WORD REVEAL ─────────────────────────────────────────────────────────
 function initHeroWordReveal() {
