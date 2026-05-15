@@ -79,9 +79,9 @@ body.cursor-hover #cursor-dot {
   width: 5px; height: 5px;
   background: var(--blue);
 }
-@media (hover: none) {
-  #cursor-dot, #cursor-ring { display: none; }
-  *, *:hover, *:active { cursor: auto !important; }
+@media (hover: none), (pointer: coarse) {
+  #cursor-dot, #cursor-ring { display: none !important; }
+  html, body, *, *:hover, *:focus, *:active { cursor: auto !important; }
 }
 
 /* ─── PAGE LOADER BAR (non-blocking, thin bottom line) ──────────────────────── */

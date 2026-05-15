@@ -410,7 +410,10 @@ function initMarquee() {
 function initCursor() {
   const dot  = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
-  if (!dot || !ring || window.matchMedia('(hover: none)').matches) return;
+  const isTouch = window.matchMedia('(hover: none)').matches
+               || window.matchMedia('(pointer: coarse)').matches
+               || 'ontouchstart' in window;
+  if (!dot || !ring || isTouch) return;
 
   // Use GSAP transform (GPU, no layout reflow)
   gsap.set([dot, ring], { xPercent: -50, yPercent: -50 });
